@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Gangorra Física</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#0f172a;
+    overflow:hidden;
+}
+
+/* CENA */
+.scene{
+    position:relative;
+    width:900px;
+    height:500px;
+}
+
+/* GANGORRA */
+.seesaw{
+    position:absolute;
+
+    width:600px;
+    height:18px;
+
+    background:white;
+
+    left:50%;
+    top:240px;
+
+    transform-origin:center center;
+    border-radius:12px;
+
+    box-shadow:
+        0 0 12px rgba(255,255,255,0.35);
+}
+
+/* HEXÁGONO */
+.hexagon{
+    position:absolute;
+
+    width:70px;
+    height:70px;
+
+    background:white;
+
+    clip-path:polygon(
+        25% 0%,
+        75% 0%,
+        100% 50%,
+        75% 100%,
+        25% 100%,
+        0% 50%
+    );
+
+    box-shadow:
+        0 0 20px rgba(255,255,255,0.4);
+
+    z-index:5;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="scene">
+
+    <div class="seesaw" id="seesaw"></div>
+
+    <div class="hexagon" id="hexagon"></div>
+
+</div>
+
+<script>
+
+const seesaw = document.getElementById("seesaw");
+const hexagon = document.getElementById("hexagon");
+
+let angle = 0;
+let time = 0;
+
+let position = 0;
+let velocity = 0;
+
+const seesawWidth = 600;
+
+const centerX = 450;
+const centerY = 249;
+
+function animate(){
+
+    requestAnimationFrame(animate);
+
+    time += 0.045;
+
+    /* Movimento da gangorra */
+    angle = Math.sin(time) * 20;
+
+    seesaw.style.transform =
+        `translateX(-50%) rotate(${angle}deg)`;
+
+    /* Gravidade */
+    const acceleration =
+        Math.sin(angle * Math.PI / 180) * 0.50;
+
+    velocity += acceleration;
+
+    /* Atrito */
+    velocity *= 0.992;
+
+    /* Movimento */
+    position += velocity;
+
+    /* Limites */
+    const limit =
+        seesawWidth / 2 - 40;
+
+    /* Colisão */
+    if(position > limit){
+
+        position = limit;
+
+        velocity *= -0.75;
+    }
+
+    if(position < -limit){
+
+        position = -limit;
+
+        velocity *= -0.75;
+    }
+
+    /* Conversão angular */
+    const radians =
+        angle * Math.PI / 180;
+
+    /* Coordenadas */
+    const rotatedX =
+        position * Math.cos(radians);
+
+    const rotatedY =
+        position * Math.sin(radians);
+
+    /* Posição do hexágono */
+    hexagon.style.left =
+        (centerX + rotatedX - 35) + "px";
+
+    hexagon.style.top =
+        (centerY + rotatedY - 78) + "px";
+
+    /* Rotação */
+    hexagon.style.transform =
+        `rotate(${position * 1.8}deg)`;
+}
+
+animate();
+
+</script>
+
+</body>
+</html>
